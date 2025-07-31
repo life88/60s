@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Newspaper, RefreshCw, ExternalLink, TrendingUp } from 'lucide-react'
+import { Newspaper, RefreshCw, ExternalLink } from 'lucide-react'
 import { ApiPageLayout } from '@/components/ApiPageLayout'
 import { baseUrl } from '@/lib/config'
 
