@@ -1,38 +1,39 @@
 import { useState } from 'react'
+import { ApiPageLayout } from '@/components/ApiPageLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Newspaper, RefreshCw, ExternalLink, TrendingUp } from 'lucide-react'
-import { ApiPageLayout } from '@/components/ApiPageLayout'
+import { RefreshCw, TrendingUp, Star } from 'lucide-react'
 import { baseUrl } from '@/lib/config'
 
-interface ToutiaoItem {
-  title: string
-  hot_value: number
-  cover: string
-  link: string
-}
-
-interface ToutiaoResponse {
-  code: number
-  message: string
-  data: ToutiaoItem[]
-}
-
-const ToutiaoPage = () => {
-  const [result, setResult] = useState<ToutiaoResponse | null>(null)
+const DouyinPage = () => {
   const [loading, setLoading] = useState(false)
+  const [data, setData] = useState<{
+    code: number;
+    message: string;
+    data?: Array<{
+      title: string;
+      hot_value: number;
+      cover: string;
+      link: string;
+      event_time: string;
+      event_time_at: number;
+      active_time: string;
+      active_time_at: number;
+    }>;
+  } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const handleGetNews = async () => {
+  const fetchData = async () => {
     setLoading(true)
     setError(null)
+    
     try {
-      const response = await fetch(`${baseUrl}/v2/toutiao`)
+      const response = await fetch(`${baseUrl}/v2/douyin`)
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
-      const data = await response.json()
-      setResult(data)
+      const result = await response.json()
+      setData(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : '获取数据失败')
     } finally {
@@ -40,29 +41,24 @@ const ToutiaoPage = () => {
     }
   }
 
-  const formatHotValue = (hot: number): string => {
-    if (hot >= 10000000) {
-      return `${(hot / 10000000).toFixed(1)}千万`
-    } else if (hot >= 10000) {
-      return `${(hot / 10000).toFixed(1)}万`
-    }
-    return hot.toLocaleString()
-  }
-
   const examples = [
     {
-      title: '获取头条热搜',
-      description: '获取今日头条实时热搜榜',
-      url: `${baseUrl}/v2/toutiao`,
+      title: "获取热搜榜",
+      description: "获取抖音实时热搜榜单",
+      url: `${baseUrl}/v2/douyin`,
       response: `{
   "code": 200,
   "message": "所有数据均来自官方，确保稳定与实时",
   "data": [
     {
-      "title": "蔡磊身体机能下降：声音变模糊",
-      "hot_value": 30631662,
-      "cover": "https://p3-sign.toutiaoimg.com/mosaic-legacy/2b29000036f8405561443~tplv-tt-shrink:960:540.jpeg",
-      "link": "https://www.toutiao.com/trending/7458575348797276186"
+      "title": "甲流的治疗方法有哪些",
+      "hot_value": 11600607,
+      "cover": "https://p3-sign.douyinpic.com/tos-cn-p-0015/oUZEvARUvII4vBQOb1i5WiCDIP13AuAwT49ar~noop.jpeg",
+      "link": "https://www.douyin.com/search/%E7%94%B2%E6%B5%81%E7%9A%84%E6%B2%BB%E7%96%97%E6%96%B9%E6%B3%95%E6%9C%89%E5%93%AA%E4%BA%9B",
+      "event_time": "2025/01/13 17:12:30",
+      "event_time_at": 1736759550,
+      "active_time": "2025-01-13 21:29:10",
+      "active_time_at": 1736774950000
     }
   ]
 }`
@@ -71,25 +67,25 @@ const ToutiaoPage = () => {
 
   return (
     <ApiPageLayout
-      title="头条热搜榜"
-      description="获取今日头条实时热搜榜单，了解当前热门话题"
-      endpoint="/v2/toutiao"
+      title="抖音热搜榜"
+      description="获取抖音实时热搜榜单，了解当前热门话题"
+      endpoint="/v2/douyin"
       examples={examples}
     >
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Newspaper className="w-5 h-5" />
+            <TrendingUp className="w-5 h-5" />
             实时热搜榜
           </CardTitle>
           <CardDescription>
-            点击下方按钮获取今日头条最新热搜数据
+            点击下方按钮获取抖音最新热搜数据
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <Button 
-              onClick={handleGetNews} 
+              onClick={fetchData} 
               disabled={loading}
               className="w-full sm:w-auto"
             >
@@ -100,7 +96,7 @@ const ToutiaoPage = () => {
                 </>
               ) : (
                 <>
-                  <Newspaper className="w-4 h-4 mr-2" />
+                  <TrendingUp className="w-4 h-4 mr-2" />
                   获取热搜榜
                 </>
               )}
@@ -113,17 +109,17 @@ const ToutiaoPage = () => {
               </div>
             )}
 
-            {result && result.data && Array.isArray(result.data) && (
+            {data && data.data && Array.isArray(data.data) && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">头条热搜榜</h3>
+                  <h3 className="text-lg font-semibold">抖音热搜榜</h3>
                   <span className="text-sm text-gray-500">
-                    共 {result.data.length} 条热搜
+                    共 {data.data.length} 条热搜
                   </span>
                 </div>
 
                 <div className="space-y-3">
-                  {result.data.map((item, index) => (
+                  {data.data.map((item, index) => (
                     <Card key={index} className="hover:shadow-md transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">
@@ -134,7 +130,8 @@ const ToutiaoPage = () => {
                                 ? 'bg-gradient-to-r from-orange-400 to-yellow-400 text-white'
                                 : 'bg-gray-100 text-gray-600'
                           }`}>
-                            {index + 1}
+                            {index < 3 && <Star className="w-4 h-4" />}
+                            {index >= 3 && (index + 1)}
                           </div>
                           
                           {item.cover && (
@@ -155,10 +152,15 @@ const ToutiaoPage = () => {
                               </h4>
                               <div className="text-right">
                                 <div className="text-sm font-semibold text-red-600">
-                                  {formatHotValue(item.hot_value)}
+                                  {item.hot_value.toLocaleString()}
                                 </div>
                                 <div className="text-xs text-gray-500">热度</div>
                               </div>
+                            </div>
+                            
+                            <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+                              <span>事件时间: {item.event_time}</span>
+                              <span>激活时间: {item.active_time}</span>
                             </div>
                             
                             {item.link && (
@@ -168,8 +170,7 @@ const ToutiaoPage = () => {
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 mt-2"
                               >
-                                <ExternalLink className="w-3 h-3 mr-1" />
-                                查看详情
+                                在抖音中搜索 →
                               </a>
                             )}
                           </div>
@@ -187,4 +188,4 @@ const ToutiaoPage = () => {
   )
 }
 
-export default ToutiaoPage
+export default DouyinPage

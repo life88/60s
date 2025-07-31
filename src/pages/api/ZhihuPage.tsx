@@ -1,24 +1,27 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { TrendingUp, RefreshCw, AlertCircle, ExternalLink, Clock, MessageSquare } from 'lucide-react'
+import { TrendingUp, RefreshCw, AlertCircle, ExternalLink, MessageSquare } from 'lucide-react'
 import { baseUrl } from '@/lib/config'
 import { ApiPageLayout } from '@/components/ApiPageLayout'
 
 interface ZhihuItem {
   title: string
-  url: string
-  answerCount?: number
-  heat?: number
-  excerpt?: string
-  rank: number
+  detail: string
+  cover: string
+  hot_value_desc: string
+  answer_cnt: number
+  follower_cnt: number
+  comment_cnt: number
+  created_at: number
+  created: string
+  link: string
 }
 
 interface ZhihuResponse {
   code: number
+  message: string
   data: ZhihuItem[]
-  updateTime?: string
 }
 
 const ZhihuPage = () => {
@@ -44,13 +47,6 @@ const ZhihuPage = () => {
     handleGetZhihu()
   }, [])
 
-  const formatNumber = (num: number): string => {
-    if (num >= 10000) {
-      return `${(num / 10000).toFixed(1)}万`
-    }
-    return num.toString()
-  }
-
   const getRankColor = (rank: number): string => {
     if (rank <= 3) return 'bg-gradient-to-r from-yellow-400 to-orange-500'
     if (rank <= 10) return 'bg-gradient-to-r from-blue-500 to-purple-500'
@@ -66,12 +62,25 @@ const ZhihuPage = () => {
     {
       title: '获取知乎热榜',
       description: '获取当前知乎热榜问题',
-      url: `${baseUrl}/v2/zhihu`
-    },
+      url: `${baseUrl}/v2/zhihu`,
+      response: `{
+  "code": 200,
+  "message": "所有数据均来自官方，确保稳定与实时，用户群: 595941841，开源地址: https://github.com/vikiboss/60s",
+  "data": [
     {
-      title: '限制返回条数',
-      description: '只获取前20条热榜',
-      url: `${baseUrl}/v2/zhihu?limit=20`
+      "title": "重庆观音桥一夜之间大量观赏鱼离奇死亡，警方通报「系人为投毒」，有哪些细节值得关注？",
+      "detail": "1月13日，重庆市公安局江北区分局通报，江北嘉陵公园观赏鱼池中大量观赏鱼死亡案件已查明，系该公园一游乐项目经营者李某（男，48岁）所为。",
+      "cover": "https://picx.zhimg.com/80/v2-ec048ba8103dd08f9ad248af633391b5_1440w.webp?source=1def8aca",
+      "hot_value_desc": "1094 万热度",
+      "answer_cnt": 181,
+      "follower_cnt": 450,
+      "comment_cnt": 0,
+      "created_at": 1736676753000,
+      "created": "2025/01/12 18:12:33",
+      "link": "https://api.zhihu.com/questions/9408823731"
+    }
+  ]
+}`
     }
   ]
 
@@ -123,12 +132,6 @@ const ZhihuPage = () => {
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="w-5 h-5" />
                 热榜问题
-                {result.updateTime && (
-                  <Badge variant="secondary" className="ml-auto">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {result.updateTime}
-                  </Badge>
-                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -143,9 +146,9 @@ const ZhihuPage = () => {
                         {/* 排名徽章 */}
                         <div className={`
                           w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-md
-                          ${getRankColor(item.rank || index + 1)}
+                          ${getRankColor(index + 1)}
                         `}>
-                          {item.rank || index + 1}
+                          {index + 1}
                         </div>
 
                         {/* 问题内容 */}
@@ -154,36 +157,47 @@ const ZhihuPage = () => {
                             {item.title}
                           </h3>
                           
-                          {/* 摘要 */}
-                          {item.excerpt && (
-                            <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                              {item.excerpt}
+                          {/* 话题详情 */}
+                          {item.detail && (
+                            <p className="text-sm text-gray-600 line-clamp-3 mb-3">
+                              {item.detail.length > 200 ? item.detail.substring(0, 200) + '...' : item.detail}
                             </p>
                           )}
 
                           {/* 统计信息 */}
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            {item.answerCount !== undefined && (
-                              <div className="flex items-center gap-1">
-                                <MessageSquare className="w-3 h-3" />
-                                <span>{formatNumber(item.answerCount)} 回答</span>
-                              </div>
-                            )}
-                            {item.heat !== undefined && (
-                              <div className="flex items-center gap-1">
-                                <TrendingUp className="w-3 h-3" />
-                                <span>{formatNumber(item.heat)} 热度</span>
-                              </div>
-                            )}
+                          <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
+                            <div className="flex items-center gap-1">
+                              <MessageSquare className="w-3 h-3" />
+                              <span>{item.answer_cnt} 回答</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3" />
+                              <span>{item.hot_value_desc}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span>{item.follower_cnt} 关注</span>
+                            </div>
                           </div>
+
+                          {/* 封面图片 */}
+                          {item.cover && (
+                            <img 
+                              src={item.cover} 
+                              alt={item.title}
+                              className="w-full max-w-sm h-32 object-cover rounded mt-2"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none'
+                              }}
+                            />
+                          )}
                         </div>
 
                         {/* 查看链接 */}
-                        {item.url && (
+                        {item.link && (
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => window.open(item.url, '_blank')}
+                            onClick={() => window.open(item.link, '_blank')}
                             className="flex-shrink-0"
                           >
                             <ExternalLink className="w-4 h-4 mr-1" />

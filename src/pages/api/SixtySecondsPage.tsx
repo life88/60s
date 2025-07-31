@@ -11,10 +11,24 @@ const SixtySecondsPage = () => {
     code: number;
     message: string;
     data?: {
-      date?: string;
-      news?: string[];
-      tip?: string;
-      image?: string;
+      date: string;
+      news: string[];
+      audio: {
+        music: string;
+        news: string;
+      };
+      image: string;
+      tip: string;
+      cover: string;
+      link: string;
+      created: string;
+      created_at: number;
+      updated: string;
+      updated_at: number;
+      day_of_week: string;
+      lunar_date: string;
+      api_updated: string;
+      api_updated_at: number;
     };
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -44,16 +58,30 @@ const SixtySecondsPage = () => {
       url: `${baseUrl}/v2/60s`,
       response: `{
   "code": 200,
-  "message": "ok",
+  "message": "获取成功。数据来自官方/权威源头，以确保稳定与实时",
   "data": {
-    "date": "2024年1月1日",
+    "date": "2025-07-31",
     "news": [
       "1、新闻内容1...",
       "2、新闻内容2...",
       "..."
     ],
+    "audio": {
+      "music": "",
+      "news": ""
+    },
+    "image": "封面图片URL",
     "tip": "每日一句正能量话语",
-    "image": "封面图片URL"
+    "cover": "封面图片URL",
+    "link": "原文链接",
+    "created": "2025/07/31 01:41:46",
+    "created_at": 1753897306000,
+    "updated": "2025/07/31 01:41:46", 
+    "updated_at": 1753897306000,
+    "day_of_week": "星期四",
+    "lunar_date": "乙巳年闰六月初七",
+    "api_updated": "2025/07/31 21:59:35",
+    "api_updated_at": 1753970375600
   }
 }`
     }
@@ -103,23 +131,46 @@ const SixtySecondsPage = () => {
               </div>
             )}
 
-            {data && (
+            {data && data.data && (
               <div className="space-y-4">
-                {/* 日期 */}
-                {data.data?.date && (
+                {/* 日期和农历信息 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Clock className="w-4 h-4" />
-                    <span>{data.data.date}</span>
+                    <span>{data.data.date} {data.data.day_of_week}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Calendar className="w-4 h-4" />
+                    <span>{data.data.lunar_date}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <RefreshCw className="w-4 h-4" />
+                    <span>更新: {data.data.api_updated}</span>
+                  </div>
+                </div>
+
+                {/* 封面图片 */}
+                {data.data.cover && (
+                  <div>
+                    <h4 className="font-medium mb-2">封面图片</h4>
+                    <img 
+                      src={data.data.cover} 
+                      alt="每日封面" 
+                      className="w-full max-w-md rounded-lg shadow-sm"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
                   </div>
                 )}
 
                 {/* 新闻列表 */}
-                {data.data?.news && (
+                {data.data.news && (
                   <div>
                     <h3 className="font-medium mb-3">今日新闻</h3>
                     <div className="space-y-2">
                       {data.data.news.map((item: string, index: number) => (
-                        <div key={index} className="bg-white p-3 rounded border text-sm">
+                        <div key={index} className="bg-white p-3 rounded border text-sm leading-relaxed">
                           {item}
                         </div>
                       ))}
@@ -128,20 +179,35 @@ const SixtySecondsPage = () => {
                 )}
 
                 {/* 每日一句 */}
-                {data.data?.tip && (
+                {data.data.tip && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <h4 className="font-medium text-blue-800 mb-2">每日一句</h4>
                     <p className="text-blue-700 text-sm italic">"{data.data.tip}"</p>
                   </div>
                 )}
 
-                {/* 封面图片 */}
-                {data.data?.image && (
+                {/* 原文链接 */}
+                {data.data.link && (
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-800 mb-2">原文链接</h4>
+                    <a 
+                      href={data.data.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm break-all"
+                    >
+                      {data.data.link}
+                    </a>
+                  </div>
+                )}
+
+                {/* 底部图片 */}
+                {data.data.image && data.data.image !== data.data.cover && (
                   <div>
-                    <h4 className="font-medium mb-2">封面图片</h4>
+                    <h4 className="font-medium mb-2">配图</h4>
                     <img 
                       src={data.data.image} 
-                      alt="每日封面" 
+                      alt="配图" 
                       className="w-full max-w-md rounded-lg shadow-sm"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none'

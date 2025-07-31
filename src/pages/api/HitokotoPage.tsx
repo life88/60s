@@ -11,17 +11,14 @@ const HitokotoPage = () => {
     code: number;
     message: string;
     data?: {
-      text?: string;
-      from?: string;
-      type?: string;
-      author?: string;
+      index: number;
+      hitokoto: string;
     };
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [history, setHistory] = useState<Array<{
-    text: string;
-    from?: string;
-    author?: string;
+    index: number;
+    hitokoto: string;
     timestamp: number;
   }>>([])
 
@@ -38,11 +35,10 @@ const HitokotoPage = () => {
       setData(result)
       
       // 添加到历史记录
-      if (result.data?.text) {
+      if (result.data?.hitokoto) {
         setHistory(prev => [{
-          text: result.data.text,
-          from: result.data.from,
-          author: result.data.author,
+          index: result.data.index,
+          hitokoto: result.data.hitokoto,
           timestamp: Date.now()
         }, ...prev.slice(0, 9)]) // 只保留最近10条
       }
@@ -81,15 +77,6 @@ const HitokotoPage = () => {
 }`
     }
   ]
-
-  const typeColors: { [key: string]: string } = {
-    '励志': 'bg-blue-100 text-blue-800',
-    '爱情': 'bg-pink-100 text-pink-800',
-    '友情': 'bg-green-100 text-green-800',
-    '生活': 'bg-yellow-100 text-yellow-800',
-    '学习': 'bg-purple-100 text-purple-800',
-    '默认': 'bg-gray-100 text-gray-800'
-  }
 
   return (
     <ApiPageLayout
@@ -142,24 +129,12 @@ const HitokotoPage = () => {
                   <div className="space-y-4">
                     {/* 句子内容 */}
                     <blockquote className="text-lg font-medium text-gray-800 leading-relaxed">
-                      "{data.data.text}"
+                      "{data.data.hitokoto}"
                     </blockquote>
                     
                     {/* 元信息 */}
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-                      {data.data.type && (
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          typeColors[data.data.type] || typeColors['默认']
-                        }`}>
-                          {data.data.type}
-                        </span>
-                      )}
-                      {data.data.from && (
-                        <span>—— 《{data.data.from}》</span>
-                      )}
-                      {data.data.author && (
-                        <span>{data.data.author}</span>
-                      )}
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <span>编号: #{data.data.index}</span>
                     </div>
                     
                     {/* 操作按钮 */}
@@ -167,7 +142,7 @@ const HitokotoPage = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => shareQuote(data.data!.text || '')}
+                        onClick={() => shareQuote(data.data!.hitokoto || '')}
                       >
                         <Share2 className="w-4 h-4 mr-1" />
                         分享
@@ -177,7 +152,7 @@ const HitokotoPage = () => {
                         size="sm"
                         onClick={() => {
                           // 简单的喜欢功能，可以扩展为收藏
-                          console.log('liked:', data.data?.text)
+                          console.log('liked:', data.data?.hitokoto)
                         }}
                       >
                         <Heart className="w-4 h-4 mr-1" />
@@ -204,12 +179,9 @@ const HitokotoPage = () => {
               <div className="space-y-3">
                 {history.map((item, index) => (
                   <div key={index} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
-                    <p className="text-sm font-medium text-gray-800 mb-1">"{item.text}"</p>
+                    <p className="text-sm font-medium text-gray-800 mb-1">"{item.hitokoto}"</p>
                     <div className="flex justify-between items-center text-xs text-gray-500">
-                      <span>
-                        {item.from && `《${item.from}》`}
-                        {item.author && ` ${item.author}`}
-                      </span>
+                      <span>编号: #{item.index}</span>
                       <span>{new Date(item.timestamp).toLocaleTimeString()}</span>
                     </div>
                   </div>

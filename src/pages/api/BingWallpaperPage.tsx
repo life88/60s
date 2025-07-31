@@ -10,18 +10,16 @@ import { baseUrl } from '@/lib/config'
 
 interface BingWallpaperResponse {
   code: number
+  message: string
   data: {
-    url: string
     title: string
+    headline: string
+    description: string
+    main_text: string
+    cover: string
     copyright: string
-    date: string
-    story?: string
-    quiz?: string
-    wp?: boolean
-    hsh?: string
-    drk?: number
-    top?: number
-    bot?: number
+    update_date: string
+    update_date_at: number
   }
 }
 
@@ -41,6 +39,10 @@ const BingWallpaperPage = () => {
       
       const response = await fetch(url)
       const data = await response.json()
+      console.log('获取必应壁纸:', data, result);
+      if (data?.data.cover && data.data.cover === result?.data.cover) {
+        setImageLoading(false)
+      }
       setResult(data)
     } catch (error) {
       console.error('获取必应壁纸失败:', error)
@@ -70,10 +72,10 @@ const BingWallpaperPage = () => {
   }, [])
 
   const handleDownload = () => {
-    if (result?.data?.url) {
+    if (result?.data?.cover) {
       const link = document.createElement('a')
-      link.href = result.data.url
-      link.download = `bing-wallpaper-${result.data.date}.jpg`
+      link.href = result.data.cover
+      link.download = `bing-wallpaper-${result.data.update_date}.jpg`
       link.target = '_blank'
       document.body.appendChild(link)
       link.click()
@@ -182,7 +184,7 @@ const BingWallpaperPage = () => {
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">
                         <Calendar className="w-3 h-3 mr-1" />
-                        {result.data.date}
+                        {result.data.update_date}
                       </Badge>
                     </div>
                   </div>
@@ -190,7 +192,7 @@ const BingWallpaperPage = () => {
                   {/* 图片预览 */}
                   <div className="relative">
                     <img
-                      src={result.data.url}
+                      src={result.data.cover}
                       alt={result.data.title}
                       className="w-full h-auto max-h-96 object-cover rounded-lg shadow-lg"
                       onLoad={() => setImageLoading(false)}
@@ -203,22 +205,32 @@ const BingWallpaperPage = () => {
                     )}
                   </div>
 
-                  {/* 故事背景 */}
-                  {result.data.story && (
+                  {/* 壁纸描述 */}
+                  {result.data.description && (
                     <div className="p-4 bg-blue-50 rounded-lg">
-                      <h4 className="font-semibold text-blue-900 mb-2">背景故事</h4>
+                      <h4 className="font-semibold text-blue-900 mb-2">壁纸描述</h4>
                       <p className="text-blue-800 leading-relaxed">
-                        {result.data.story}
+                        {result.data.description}
                       </p>
                     </div>
                   )}
 
-                  {/* 小知识 */}
-                  {result.data.quiz && (
+                  {/* 详细介绍 */}
+                  {result.data.main_text && (
                     <div className="p-4 bg-green-50 rounded-lg">
-                      <h4 className="font-semibold text-green-900 mb-2">小知识</h4>
+                      <h4 className="font-semibold text-green-900 mb-2">详细介绍</h4>
                       <p className="text-green-800 leading-relaxed">
-                        {result.data.quiz}
+                        {result.data.main_text}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 大纲标题 */}
+                  {result.data.headline && (
+                    <div className="p-4 bg-purple-50 rounded-lg">
+                      <h4 className="font-semibold text-purple-900 mb-2">大纲标题</h4>
+                      <p className="text-purple-800 leading-relaxed">
+                        {result.data.headline}
                       </p>
                     </div>
                   )}
@@ -231,35 +243,11 @@ const BingWallpaperPage = () => {
                     </Button>
                     <Button 
                       variant="outline" 
-                      onClick={() => window.open(result.data.url, '_blank')}
+                      onClick={() => window.open(result.data.cover, '_blank')}
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       查看原图
                     </Button>
-                  </div>
-
-                  {/* 技术信息 */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                    {result.data.wp !== undefined && (
-                      <Badge variant="outline">
-                        壁纸: {result.data.wp ? '是' : '否'}
-                      </Badge>
-                    )}
-                    {result.data.hsh && (
-                      <Badge variant="outline">
-                        Hash: {result.data.hsh.substring(0, 8)}...
-                      </Badge>
-                    )}
-                    {result.data.drk !== undefined && (
-                      <Badge variant="outline">
-                        暗色: {result.data.drk}
-                      </Badge>
-                    )}
-                    {result.data.top !== undefined && (
-                      <Badge variant="outline">
-                        顶部: {result.data.top}
-                      </Badge>
-                    )}
                   </div>
                 </div>
               ) : (

@@ -7,16 +7,22 @@ import { ApiPageLayout } from '@/components/ApiPageLayout'
 import { baseUrl } from '@/lib/config'
 
 interface HistoryItem {
-  year: string
   title: string
-  desc?: string
-  pic?: string
+  year: string
+  description: string
+  event_type: string
+  link: string
 }
 
 interface HistoryResponse {
   code: number
-  data: HistoryItem[]
-  date?: string
+  message: string
+  data: {
+    date: string
+    month: number
+    day: number
+    items: HistoryItem[]
+  }
 }
 
 const HistoryPage = () => {
@@ -107,10 +113,10 @@ const HistoryPage = () => {
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5" />
                 历史事件
-                {result.date && (
+                {result.data?.date && (
                   <Badge variant="secondary" className="ml-auto">
                     <Clock className="w-3 h-3 mr-1" />
-                    {result.date}
+                    {result.data.date}
                   </Badge>
                 )}
               </CardTitle>
@@ -118,7 +124,7 @@ const HistoryPage = () => {
             <CardContent>
               {result.code === 200 ? (
                 <div className="space-y-4">
-                  {result.data?.map((item, index) => (
+                  {result.data?.items?.map((item, index) => (
                     <div
                       key={index}
                       className="p-4 rounded-lg border hover:shadow-md transition-all duration-200"
@@ -135,32 +141,43 @@ const HistoryPage = () => {
                             {item.title}
                           </h3>
                           
-                          {item.desc && (
-                            <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                              {item.desc}
+                          {/* 事件描述 */}
+                          {item.description && (
+                            <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                              {item.description.length > 200 ? item.description.substring(0, 200) + '...' : item.description}
                             </p>
                           )}
 
-                          {/* 图片 */}
-                          {item.pic && (
-                            <div className="mt-3">
-                              <img
-                                src={item.pic}
-                                alt={item.title}
-                                className="max-w-full h-auto rounded-lg shadow-sm max-h-48 object-cover"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement
-                                  target.style.display = 'none'
-                                }}
-                              />
-                            </div>
+                          {/* 事件类型 */}
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant={
+                              item.event_type === 'birth' ? 'default' :
+                              item.event_type === 'death' ? 'destructive' :
+                              'secondary'
+                            }>
+                              {item.event_type === 'birth' ? '出生' :
+                               item.event_type === 'death' ? '逝世' :
+                               '事件'}
+                            </Badge>
+                          </div>
+
+                          {/* 链接 */}
+                          {item.link && (
+                            <a 
+                              href={item.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 text-sm"
+                            >
+                              查看详情 →
+                            </a>
                           )}
                         </div>
                       </div>
                     </div>
                   ))}
 
-                  {(!result.data || result.data.length === 0) && (
+                  {(!result.data || !result.data.items || result.data.items.length === 0) && (
                     <div className="text-center py-8 text-gray-500">
                       暂无历史事件数据
                     </div>

@@ -1,24 +1,20 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { TrendingUp, RefreshCw, AlertCircle, ExternalLink, Clock, Flame } from 'lucide-react'
+import { TrendingUp, RefreshCw, AlertCircle, ExternalLink, Flame } from 'lucide-react'
 import { baseUrl } from '@/lib/config'
 import { ApiPageLayout } from '@/components/ApiPageLayout'
 
 interface WeiboItem {
   title: string
-  url: string
-  hot: number
-  rank: number
-  category?: string
-  icon?: string
+  hot_value: number
+  link: string
 }
 
 interface WeiboResponse {
   code: number
+  message: string
   data: WeiboItem[]
-  updateTime?: string
 }
 
 const WeiboPage = () => {
@@ -68,12 +64,23 @@ const WeiboPage = () => {
     {
       title: '获取微博热搜',
       description: '获取当前微博热搜榜单',
-      url: `${baseUrl}/v2/weibo`
+      url: `${baseUrl}/v2/weibo`,
+      response: `{
+  "code": 200,
+  "message": "所有数据均来自官方，确保稳定与实时，用户群: 595941841，开源地址: https://github.com/vikiboss/60s",
+  "data": [
+    {
+      "title": "日本地震",
+      "hot_value": 2453217,
+      "link": "https://s.weibo.com/weibo?q=%E6%97%A5%E6%9C%AC%E5%9C%B0%E9%9C%87"
     },
     {
-      title: '限制返回条数',
-      description: '只获取前20条热搜',
-      url: `${baseUrl}/v2/weibo?limit=20`
+      "title": "手机尾号0000000成交价70万",
+      "hot_value": 1472157,
+      "link": "https://s.weibo.com/weibo?q=%E6%89%8B%E6%9C%BA%E5%B0%BE%E5%8F%B70000000%E6%88%90%E4%BA%A4%E4%BB%B770%E4%B8%87"
+    }
+  ]
+}`
     }
   ]
 
@@ -125,12 +132,6 @@ const WeiboPage = () => {
               <CardTitle className="flex items-center gap-2">
                 <Flame className="w-5 h-5" />
                 热搜榜单
-                {result.updateTime && (
-                  <Badge variant="secondary" className="ml-auto">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {result.updateTime}
-                  </Badge>
-                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -144,9 +145,9 @@ const WeiboPage = () => {
                       {/* 排名 */}
                       <div className={`
                         w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold
-                        ${getHotColor(item.rank || index + 1)}
+                        ${getHotColor(index + 1)}
                       `}>
-                        {item.rank || index + 1}
+                        {index + 1}
                       </div>
 
                       {/* 内容 */}
@@ -155,29 +156,21 @@ const WeiboPage = () => {
                           <h3 className="font-medium text-gray-900 truncate">
                             {item.title}
                           </h3>
-                          {item.category && (
-                            <Badge variant="outline" className="text-xs">
-                              {item.category}
-                            </Badge>
-                          )}
-                          {item.icon && (
-                            <span className="text-sm">{item.icon}</span>
-                          )}
                         </div>
-                        {item.hot > 0 && (
+                        {item.hot_value > 0 && (
                           <div className="flex items-center gap-1 text-sm text-gray-600">
                             <TrendingUp className="w-3 h-3" />
-                            <span>{formatHotValue(item.hot)} 热度</span>
+                            <span>{formatHotValue(item.hot_value)} 热度</span>
                           </div>
                         )}
                       </div>
 
                       {/* 链接 */}
-                      {item.url && (
+                      {item.link && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => window.open(item.url, '_blank')}
+                          onClick={() => window.open(item.link, '_blank')}
                           className="flex-shrink-0"
                         >
                           <ExternalLink className="w-4 h-4" />

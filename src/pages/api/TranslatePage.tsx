@@ -12,10 +12,18 @@ const TranslatePage = () => {
     code: number;
     message: string;
     data?: {
-      from?: string;
-      to?: string;
-      text?: string;
-      result?: string;
+      source: {
+        text: string;
+        type: string;
+        type_desc: string;
+        pronounce: string;
+      };
+      target: {
+        text: string;
+        type: string;
+        type_desc: string;
+        pronounce: string;
+      };
     };
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -221,8 +229,11 @@ const TranslatePage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                   <div className="space-y-1">
                     <label className="text-xs text-gray-500">原文</label>
-                    <p className="text-sm bg-white p-2 rounded border">{data.data.text}</p>
-                    <p className="text-xs text-gray-500">语言: {data.data.from}</p>
+                    <p className="text-sm bg-white p-2 rounded border">{data.data.source.text}</p>
+                    <p className="text-xs text-gray-500">语言: {data.data.source.type_desc}</p>
+                    {data.data.source.pronounce && (
+                      <p className="text-xs text-blue-600">读音: {data.data.source.pronounce}</p>
+                    )}
                   </div>
                   
                   <div className="flex justify-center">
@@ -231,8 +242,11 @@ const TranslatePage = () => {
                   
                   <div className="space-y-1">
                     <label className="text-xs text-gray-500">译文</label>
-                    <p className="text-sm bg-white p-2 rounded border font-medium">{data.data.result}</p>
-                    <p className="text-xs text-gray-500">语言: {data.data.to}</p>
+                    <p className="text-sm bg-white p-2 rounded border font-medium">{data.data.target.text}</p>
+                    <p className="text-xs text-gray-500">语言: {data.data.target.type_desc}</p>
+                    {data.data.target.pronounce && (
+                      <p className="text-xs text-blue-600">读音: {data.data.target.pronounce}</p>
+                    )}
                   </div>
                 </div>
               </div>

@@ -45,40 +45,115 @@ const HomePage = () => {
   ) || []
 
   const getEndpointName = (endpoint: string) => {
-    return endpoint.replace('/v2/', '').replace('/', '')
+    return endpoint.replace('/v2/', '')
   }
 
   const getEndpointDescription = (endpoint: string) => {
     const descriptions: { [key: string]: string } = {
-      '60s': '每日60秒读懂世界',
-      'answer': '智能问答',
-      'baike': '百科查询',
-      'bili': 'B站相关',
-      'bing': '必应搜索',
-      'changya': '唱鸭',
-      'chemical': '化学元素',
-      'douyin': '抖音相关',
-      'duanzi': '段子笑话',
-      'epic': 'Epic游戏',
-      'exchange_rate': '汇率查询',
-      'fabing': '发病语录',
-      'hitokoto': '一言',
-      'ip': 'IP查询',
-      'kfc': 'KFC疯狂星期四',
-      'luck': '运势查询',
-      'maoyan': '猫眼电影',
+      // 日更资讯
+      '60s': '每日60秒读懂世界新闻摘要',
+      'bing': '必应每日壁纸',
+      'exchange_rate': '当日货币汇率',
       'today_in_history': '历史上的今天',
-      'toutiao': '今日头条',
-      'weibo': '微博热搜',
-      'zhihu': '知乎热榜',
-      'og': 'OG信息',
-      'hash': '哈希算法',
-      'fanyi': '翻译服务',
-      'fanyi/langs': '支持的语言列表'
+      
+      // 热门榜单
+      'bili': '哔哩哔哩热搜榜',
+      'maoyan': '猫眼票房排行榜',
+      'weibo': '微博热搜榜',
+      'zhihu': '知乎热门话题',
+      'douyin': '抖音热搜榜',
+      'toutiao': '头条热搜榜',
+      
+      // 实用功能
+      'epic': 'Epic Games 免费游戏',
+      'baike': '百度百科词条',
+      'fanyi': '在线翻译（支持109种语言）',
+      'fanyi/langs': '翻译支持的语言列表',
+      'ip': '公网IP地址查询',
+      'og': '链接OG信息获取',
+      'hash': '哈希/解压/压缩',
+      'weather': '天气查询',
+      '7d': '7天天气预报',
+      'lunar': '农历信息查询',
+      
+      // 消遣娱乐
+      'changya': '随机唱歌音频',
+      'chemical': '随机化合物',
+      'hitokoto': '随机一言',
+      'luck': '随机运势',
+      'duanzi': '随机搞笑段子',
+      'fabing': '随机发病文学',
+      'answer': '随机答案之书',
+      'kfc': 'KFC疯狂星期四文案',
+      
+      // 其他
+      'bizhi': '随机壁纸',
+      'dog': '随机狗狗图片'
     }
     
     const name = getEndpointName(endpoint)
     return descriptions[name] || '接口服务'
+  }
+
+  // 获取接口分类
+  const getEndpointCategory = (endpoint: string): string => {
+    const name = getEndpointName(endpoint)
+    
+    const categories: { [key: string]: string } = {
+      // 日更资讯
+      '60s': '🗞️ 日更资讯',
+      'bing': '🗞️ 日更资讯',
+      'exchange_rate': '🗞️ 日更资讯',
+      'today_in_history': '🗞️ 日更资讯',
+      
+      // 热门榜单
+      'bili': '🔥 热门榜单',
+      'maoyan': '🔥 热门榜单',
+      'weibo': '🔥 热门榜单',
+      'zhihu': '🔥 热门榜单',
+      'douyin': '🔥 热门榜单',
+      'toutiao': '🔥 热门榜单',
+      
+      // 实用功能
+      'epic': '🛠️ 实用功能',
+      'baike': '🛠️ 实用功能',
+      'fanyi': '🛠️ 实用功能',
+      'fanyi/langs': '🛠️ 实用功能',
+      'ip': '🛠️ 实用功能',
+      'og': '🛠️ 实用功能',
+      'hash': '🛠️ 实用功能',
+      'weather': '🛠️ 实用功能',
+      '7d': '🛠️ 实用功能',
+      'lunar': '🛠️ 实用功能',
+      
+      // 消遣娱乐
+      'changya': '🎮 消遣娱乐',
+      'chemical': '🎮 消遣娱乐',
+      'hitokoto': '🎮 消遣娱乐',
+      'luck': '🎮 消遣娱乐',
+      'duanzi': '🎮 消遣娱乐',
+      'fabing': '🎮 消遣娱乐',
+      'answer': '🎮 消遣娱乐',
+      'kfc': '🎮 消遣娱乐',
+      
+      // 其他
+      'bizhi': '📸 其他',
+      'dog': '📸 其他'
+    }
+    
+    return categories[name] || '📸 其他'
+  }
+
+  // 获取分类颜色
+  const getCategoryColor = (category: string): string => {
+    const colors: { [key: string]: string } = {
+      '🗞️ 日更资讯': 'bg-blue-100 text-blue-800',
+      '🔥 热门榜单': 'bg-red-100 text-red-800',
+      '🛠️ 实用功能': 'bg-green-100 text-green-800',
+      '🎮 消遣娱乐': 'bg-purple-100 text-purple-800',
+      '📸 其他': 'bg-gray-100 text-gray-800'
+    }
+    return colors[category] || 'bg-gray-100 text-gray-800'
   }
 
   // 检查是否有专门页面
@@ -87,10 +162,23 @@ const HomePage = () => {
     const specialPages = [
       '60s', 'fanyi', 'hitokoto', 'ip', 'exchange_rate', 
       'bizhi', 'weibo', 'zhihu', 'today_in_history', 
-      'toutiao', 'bing', 'dog'
+      'toutiao', 'bing', 'dog', 'baike', 'bili', 
+      'douyin', 'epic', 'duanzi', 'fabing', 'luck', 
+      'answer', 'chemical', 'hash', 'maoyan', 'og', 
+      'lunar', 'weather', 'kfc', 'fanyi/langs', 'changya', '7d'
     ]
     return specialPages.includes(name)
   }
+
+  // 按分类分组端点
+  const groupedEndpoints = filteredEndpoints.reduce((groups: { [key: string]: string[] }, endpoint) => {
+    const category = getEndpointCategory(endpoint)
+    if (!groups[category]) {
+      groups[category] = []
+    }
+    groups[category].push(endpoint)
+    return groups
+  }, {})
 
   if (loading) {
     return (
@@ -143,6 +231,7 @@ const HomePage = () => {
           <div className="text-xs sm:text-sm text-gray-600 space-y-1">
             <p>作者: {apiInfo.author}</p>
             <p>更新时间: {apiInfo.updated}</p>
+            <p>共 {apiInfo.endpoints.length} 个接口</p>
           </div>
         </div>
 
@@ -160,73 +249,93 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Endpoints Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {filteredEndpoints.map((endpoint) => {
-            const name = getEndpointName(endpoint)
-            const description = getEndpointDescription(endpoint)
-            
-            return (
-              <Card key={endpoint} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base sm:text-lg">
-                    {hasSpecialPage(endpoint) ? (
-                      <Link 
-                        to={`/api/${name}`} 
-                        className="flex items-center gap-2 hover:text-blue-700 transition-colors group"
-                      >
-                        <span className="font-mono text-blue-600 break-all">/{name}</span>
-                        <ExternalLink className="w-4 h-4 text-blue-500 group-hover:text-blue-700 transition-colors flex-shrink-0" />
-                      </Link>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <span className="font-mono text-blue-600 break-all">/{name}</span>
-                      </span>
-                    )}
-                  </CardTitle>
-                  <CardDescription className="text-sm">{description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <p className="text-xs sm:text-sm text-gray-600 font-mono bg-gray-100 px-2 py-1 rounded break-all">
-                      {endpoint}
-                    </p>
-                    
-                    {/* 操作按钮放在同一行 */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button asChild size="sm" className="text-sm">
-                        <Link to={`/endpoint/${name}`}>
-                          测试接口
-                        </Link>
-                      </Button>
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(`${baseUrl}${endpoint}`, '_blank')}
-                        className="text-sm"
-                      >
-                        <ExternalLink className="w-4 h-4 mr-1" />
-                        直接访问
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
+        {/* Grouped Endpoints */}
+        <div className="space-y-8">
+          {Object.entries(groupedEndpoints).map(([category, endpoints]) => (
+            <div key={category}>
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-xl font-bold text-gray-900">{category}</h2>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(category)}`}>
+                  {endpoints.length} 个接口
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {endpoints.map((endpoint) => {
+                  const name = getEndpointName(endpoint)
+                  const description = getEndpointDescription(endpoint)
+                  const category = getEndpointCategory(endpoint)
+                  
+                  return (
+                    <Card key={endpoint} className="hover:shadow-lg transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <CardTitle className="text-base sm:text-lg">
+                            {hasSpecialPage(endpoint) ? (
+                              <Link 
+                                to={`/api/${name}`} 
+                                className="flex items-center gap-2 hover:text-blue-700 transition-colors group"
+                              >
+                                <span className="font-mono text-blue-600 break-all">/{name}</span>
+                                <ExternalLink className="w-4 h-4 text-blue-500 group-hover:text-blue-700 transition-colors flex-shrink-0" />
+                              </Link>
+                            ) : (
+                              <span className="flex items-center gap-2">
+                                <span className="font-mono text-blue-600 break-all">/{name}</span>
+                              </span>
+                            )}
+                          </CardTitle>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(category)} ml-2 flex-shrink-0`}>
+                            {category.split(' ')[0]}
+                          </span>
+                        </div>
+                        <CardDescription className="text-sm">{description}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <p className="text-xs sm:text-sm text-gray-600 font-mono bg-gray-100 px-2 py-1 rounded break-all">
+                            {endpoint}
+                          </p>
+                          
+                          <div className="grid grid-cols-2 gap-2">
+                            {hasSpecialPage(endpoint) ? (
+                              <Button asChild size="sm" className="text-sm">
+                                <Link to={`/api/${name}`}>
+                                  打开页面
+                                </Link>
+                              </Button>
+                            ) : (
+                              <Button asChild size="sm" className="text-sm">
+                                <Link to={`/endpoint/${name}`}>
+                                  测试接口
+                                </Link>
+                              </Button>
+                            )}
+                            <Button asChild variant="outline" size="sm" className="text-sm">
+                              <a href={`${baseUrl}${endpoint}`} target="_blank" rel="noopener noreferrer">
+                                直接访问
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {filteredEndpoints.length === 0 && searchTerm && (
-          <div className="text-center py-8 sm:py-12">
-            <p className="text-gray-600">没有找到匹配的接口</p>
-          </div>
-        )}
-
         {/* Footer */}
-        <footer className="mt-12 sm:mt-16 text-center text-xs sm:text-sm text-gray-500">
-          <p>共 {apiInfo.endpoints.length} 个可用接口</p>
-        </footer>
+        <div className="mt-12 pt-8 border-t border-gray-200 text-center">
+          <p className="text-gray-600 text-sm mb-2">
+            60s API - 高质量、开源、可靠的开放API集合
+          </p>
+          <p className="text-gray-500 text-xs">
+            QQ群: {apiInfo.user_group} | 完全免费使用
+          </p>
+        </div>
       </div>
     </div>
   )
