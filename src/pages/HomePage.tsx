@@ -180,6 +180,19 @@ const HomePage = () => {
     return groups
   }, {})
 
+  // 定义分类显示顺序
+  const categoryOrder = [
+    '🗞️ 日更资讯',
+    '🔥 热门榜单', 
+    '🛠️ 实用功能',
+    '🎮 消遣娱乐',
+    '📸 其他'
+  ]
+
+  // 按照预定义顺序获取有序的分类数组
+  const orderedCategories = categoryOrder.filter(category => groupedEndpoints[category])
+    .map(category => [category, groupedEndpoints[category]] as [string, string[]])
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -251,7 +264,7 @@ const HomePage = () => {
 
         {/* Grouped Endpoints */}
         <div className="space-y-8">
-          {Object.entries(groupedEndpoints).map(([category, endpoints]) => (
+          {orderedCategories.map(([category, endpoints]) => (
             <div key={category}>
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-xl font-bold text-gray-900">{category}</h2>

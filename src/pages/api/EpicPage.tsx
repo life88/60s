@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ApiPageLayout } from '@/components/ApiPageLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { RefreshCw, Gift, ExternalLink, Calendar } from 'lucide-react'
+import { RefreshCw, Gift, ExternalLink } from 'lucide-react'
 import { baseUrl } from '@/lib/config'
 
 const EpicPage = () => {
@@ -10,26 +10,21 @@ const EpicPage = () => {
   const [data, setData] = useState<{
     code: number;
     message: string;
-    data?: {
-      current_games?: Array<{
-        title: string;
-        description: string;
-        original_price: string;
-        promotional_price?: string;
-        image: string;
-        url: string;
-        start_date?: string;
-        end_date?: string;
-      }>;
-      upcoming_games?: Array<{
-        title: string;
-        description: string;
-        image: string;
-        start_date?: string;
-        end_date?: string;
-      }>;
-      update_time?: string;
-    };
+    data?: Array<{
+      id: string;
+      title: string;
+      cover: string;
+      original_price: number;
+      original_price_desc: string;
+      description: string;
+      seller: string;
+      is_free_now: boolean;
+      free_start: string;
+      free_start_at: number;
+      free_end: string;
+      free_end_at: number;
+      link: string;
+    }>;
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -58,23 +53,24 @@ const EpicPage = () => {
       url: `${baseUrl}/v2/epic`,
       response: `{
   "code": 200,
-  "message": "ok",
-  "data": {
-    "current_games": [
-      {
-        "title": "游戏名称",
-        "description": "游戏描述",
-        "original_price": "原价",
-        "promotional_price": "促销价格",
-        "image": "游戏图片URL",
-        "url": "游戏链接",
-        "start_date": "开始时间",
-        "end_date": "结束时间"
-      }
-    ],
-    "upcoming_games": [...],
-    "update_time": "2024-01-01 12:00:00"
-  }
+  "message": "所有数据均来自官方，确保稳定与实时，用户群: 595941841，开源地址: https://github.com/vikiboss/60s",
+  "data": [
+    {
+      "id": "92acefe8e4e845169ea160bb92e3e4e0",
+      "title": "Turmoil",
+      "cover": "https://cdn1.epicgames.com/spt-assets/4985026f56654289a4a1fa848f41c4c9/turmoil-1qsb0.png",
+      "original_price": 40,
+      "original_price_desc": "¥40.00",
+      "description": "像1899年一样钻取石油！《动荡》提供了一款视觉上迷人、富有幽默感的模拟游戏，灵感来自19世纪美国的石油热潮。",
+      "seller": "Gamious",
+      "is_free_now": true,
+      "free_start": "2025/01/10 00:00:00",
+      "free_start_at": 1736438400000,
+      "free_end": "2025/01/17 00:00:00",
+      "free_end_at": 1737043200000,
+      "link": "https://store.epicgames.com/store/zh-CN/p/turmoil-26318a"
+    }
+  ]
 }`
     }
   ]
@@ -125,117 +121,136 @@ const EpicPage = () => {
 
             {data && data.data && (
               <div className="space-y-6">
-                {data.data.update_time && (
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Calendar className="w-4 h-4" />
-                    <span>更新时间: {data.data.update_time}</span>
-                  </div>
-                )}
-
                 {/* 当前免费游戏 */}
-                {data.data.current_games && data.data.current_games.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 text-green-700">
-                      🎮 当前免费游戏
-                    </h3>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {data.data.current_games.map((game, index) => (
-                        <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-                          <div className="aspect-video relative">
-                            <img 
-                              src={game.image} 
-                              alt={game.title}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.src = '/placeholder-game.jpg'
-                              }}
-                            />
-                            <div className="absolute top-2 right-2">
-                              <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-bold">
-                                免费
-                              </span>
-                            </div>
-                          </div>
-                          <CardContent className="p-4">
-                            <h4 className="font-bold text-lg mb-2">{game.title}</h4>
-                            <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                              {game.description}
-                            </p>
-                            <div className="flex items-center justify-between mb-3">
-                              <div>
-                                <span className="text-gray-500 line-through text-sm">
-                                  {game.original_price}
+                {(() => {
+                  const currentGames = data.data.filter(game => game.is_free_now)
+                  return currentGames.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3 text-green-700">
+                        🎮 当前免费游戏 ({currentGames.length}款)
+                      </h3>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {currentGames.map((game) => (
+                          <Card key={game.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                            <div className="aspect-video relative">
+                              <img 
+                                src={game.cover} 
+                                alt={game.title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder-game.jpg'
+                                }}
+                              />
+                              <div className="absolute top-2 right-2">
+                                <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-bold">
+                                  免费
                                 </span>
-                                {game.promotional_price && (
-                                  <span className="ml-2 text-green-600 font-bold">
-                                    {game.promotional_price}
-                                  </span>
-                                )}
                               </div>
                             </div>
-                            {(game.start_date || game.end_date) && (
-                              <div className="text-xs text-gray-500 mb-3">
-                                {game.start_date && `开始: ${game.start_date}`}
-                                {game.start_date && game.end_date && ' | '}
-                                {game.end_date && `结束: ${game.end_date}`}
+                            <CardContent className="p-4">
+                              <h4 className="font-bold text-lg mb-2">{game.title}</h4>
+                              <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                                {game.description}
+                              </p>
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <span className="text-gray-500 line-through text-sm">
+                                    {game.original_price_desc}
+                                  </span>
+                                  <span className="ml-2 text-green-600 font-bold">
+                                    免费
+                                  </span>
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {game.seller}
+                                </div>
                               </div>
-                            )}
-                            <a 
-                              href={game.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            >
-                              前往 Epic Games
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          </CardContent>
-                        </Card>
-                      ))}
+                              <div className="text-xs text-gray-500 mb-3">
+                                免费时间: {game.free_start} ~ {game.free_end}
+                              </div>
+                              <a 
+                                href={game.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                              >
+                                前往 Epic Games
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )
+                })()}
 
                 {/* 即将免费游戏 */}
-                {data.data.upcoming_games && data.data.upcoming_games.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 text-blue-700">
-                      ⏰ 即将免费游戏
-                    </h3>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {data.data.upcoming_games.map((game, index) => (
-                        <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-                          <div className="aspect-video relative">
-                            <img 
-                              src={game.image} 
-                              alt={game.title}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.src = '/placeholder-game.jpg'
-                              }}
-                            />
-                            <div className="absolute top-2 right-2">
-                              <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
-                                即将免费
-                              </span>
-                            </div>
-                          </div>
-                          <CardContent className="p-4">
-                            <h4 className="font-bold text-lg mb-2">{game.title}</h4>
-                            <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                              {game.description}
-                            </p>
-                            {(game.start_date || game.end_date) && (
-                              <div className="text-xs text-gray-500">
-                                {game.start_date && `开始: ${game.start_date}`}
-                                {game.start_date && game.end_date && ' | '}
-                                {game.end_date && `结束: ${game.end_date}`}
+                {(() => {
+                  const upcomingGames = data.data.filter(game => !game.is_free_now)
+                  return upcomingGames.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3 text-blue-700">
+                        ⏰ 即将免费游戏 ({upcomingGames.length}款)
+                      </h3>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {upcomingGames.map((game) => (
+                          <Card key={game.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                            <div className="aspect-video relative">
+                              <img 
+                                src={game.cover} 
+                                alt={game.title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder-game.jpg'
+                                }}
+                              />
+                              <div className="absolute top-2 right-2">
+                                <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
+                                  即将免费
+                                </span>
                               </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
+                            </div>
+                            <CardContent className="p-4">
+                              <h4 className="font-bold text-lg mb-2">{game.title}</h4>
+                              <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                                {game.description}
+                              </p>
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <span className="text-gray-700 font-medium">
+                                    {game.original_price_desc}
+                                  </span>
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {game.seller}
+                                </div>
+                              </div>
+                              <div className="text-xs text-gray-500 mb-3">
+                                免费时间: {game.free_start} ~ {game.free_end}
+                              </div>
+                              <a 
+                                href={game.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                              >
+                                前往 Epic Games
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
+                  )
+                })()}
+
+                {/* 无游戏时的提示 */}
+                {data.data.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <Gift className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p>暂无免费游戏信息</p>
                   </div>
                 )}
               </div>
