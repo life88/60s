@@ -231,7 +231,7 @@ const HomePage = () => {
               <span className="text-sm sm:text-base">API文档</span>
             </a>
             <a
-              href={apiInfo.github_repo}
+              href='https://github.com/life88/60s'
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
@@ -242,7 +242,6 @@ const HomePage = () => {
           </div>
 
           <div className="text-xs sm:text-sm text-gray-600 space-y-1">
-            <p>作者: {apiInfo.author}</p>
             <p>更新时间: {apiInfo.updated}</p>
             <p>共 {apiInfo.endpoints.length} 个接口</p>
           </div>
@@ -344,9 +343,6 @@ const HomePage = () => {
         <div className="mt-12 pt-8 border-t border-gray-200 text-center">
           <p className="text-gray-600 text-sm mb-2">
             60s API - 高质量、开源、可靠的开放API集合
-          </p>
-          <p className="text-gray-500 text-xs">
-            QQ群: {apiInfo.user_group} | 完全免费使用
           </p>
         </div>
       </div>
