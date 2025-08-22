@@ -84,6 +84,10 @@ const ZhihuPage = () => {
     }
   ]
 
+  const transformLink = (link: string) => {
+    return link?.replace('//api.', '//www.')?.replace('/questions/', '/question/');
+  }
+
   return (
     <ApiPageLayout
       title="知乎热榜"
@@ -197,7 +201,7 @@ const ZhihuPage = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => window.open(item.link, '_blank')}
+                            onClick={() => window.open(transformLink(item.link), '_blank')}
                             className="flex-shrink-0"
                           >
                             <ExternalLink className="w-4 h-4 mr-1" />
